@@ -184,6 +184,7 @@ if(AFR_ENABLE_DEMOS OR AFR_ENABLE_TESTS)
         ${board_code_src}
         ${config_files}
         "${board_dir}/application_code/main.c"
+        "${board_dir}/application_code/crash_hexdump.c"
     )
     target_link_libraries(
         ${exe_target}
@@ -193,6 +194,7 @@ if(AFR_ENABLE_DEMOS OR AFR_ENABLE_TESTS)
             # TODO: common_io must explicitly linked because nothing else depends on it. 
             # Once this is a demo, this can be removed
             AFR::common_io
+            3rdparty::crash_catcher
             -T"${board_dir}/STM32L475VGTx_FLASH.ld"
     )
 

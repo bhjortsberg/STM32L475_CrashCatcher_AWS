@@ -229,6 +229,29 @@ if(EXISTS "${AFR_3RDPARTY_DIR}/tracealyzer_recorder")
     endif()
 endif()
 
+if(EXISTS "${AFR_3RDPARTY_DIR}/CrashCatcher")
+    message("CrashCatcher")
+    add_library(afr_3rdparty_crash_catcher STATIC EXCLUDE_FROM_ALL)
+    target_sources(
+        afr_3rdparty_crash_catcher PRIVATE
+        "${AFR_3RDPARTY_DIR}/CrashCatcher/Core/src/CrashCatcher.c"
+        "${AFR_3RDPARTY_DIR}/CrashCatcher/Core/src/CrashCatcher_armv7m.S"
+        "${AFR_3RDPARTY_DIR}/CrashCatcher/HexDump/src/HexDump.c")
+    target_include_directories(
+        afr_3rdparty_crash_catcher PUBLIC
+        "${AFR_3RDPARTY_DIR}/CrashCatcher/include")
+    target_link_options(
+        afr_3rdparty_crash_catcher INTERFACE
+        -Wl,--whole-archive ${CMAKE_CURRENT_BINARY_DIR}/libafr_3rdparty_crash_catcher.a -Wl,--no-whole-archive)
+    # BHJ - target_link_libraries() is only added to get correct link options.
+    # Avoiding 'error: aws_demos.elf uses VFP register arguments, /home/bjorn/devel/aws_iot_stm32l4_crash_catcher/AmazonFreeRTOS/build/libraries/3rdparty/libafr_3rdparty_crash_catcher.a(CrashCatcher.c.obj) does not'
+    target_link_libraries(
+        afr_3rdparty_crash_catcher
+        PRIVATE AFR::kernel
+    )
+    add_library(3rdparty::crash_catcher ALIAS afr_3rdparty_crash_catcher)
+endif()
+
 # tinycrypt standard header
 if(EXISTS "${AFR_3RDPARTY_DIR}/tinycrypt")
     afr_3rdparty_module(tinycrypt)

@@ -132,6 +132,14 @@ typedef struct task_arg {
 
 SemaphoreHandle_t xSemaphore;
 
+void bhj_crash()
+{
+    int (*foo)(int i);
+    foo = (int(*)(int))0xbadc0de;
+    configPRINTF( ( "Crash!!\r\n" ) );
+    foo(6);
+}
+
 /**
  * Button checker
  */
@@ -150,6 +158,7 @@ void ButtonTask(void* argument)
         if (waitResult == pdTRUE) {
             if( xSemaphoreTake( xSemaphore, pdMS_TO_TICKS(500) ) == pdTRUE ) {
                 configPRINTF( ( "%s\r\n", arg->message ) );
+                bhj_crash();
                 xSemaphoreGive( xSemaphore );
             } else {
                 configPRINTF(( "Could not take semaphore\n" ));
@@ -308,6 +317,25 @@ void vSTM32L475putc( void * pv,
 
     do {
         status = iot_uart_write_sync( xConsoleUart, ( uint8_t * ) &ch, 1 );
+    } while( status == IOT_UART_BUSY );
+}
+/*-----------------------------------------------------------*/
+
+/**
+ * @brief Read a character from the STM32L475 UART
+ *
+ * Implemented by BHJ - Seems that it does not work
+ *
+ * @param pv    unused void pointer for compliance with tinyprintf
+ * @param ch    character to be printed
+ */
+void vSTM32L475getc( void * pv,
+                     char * ch )
+{
+    int32_t status;
+
+    do {
+        status = iot_uart_read_sync( xConsoleUart, ( uint8_t * ) ch, 1 );
     } while( status == IOT_UART_BUSY );
 }
 /*-----------------------------------------------------------*/
