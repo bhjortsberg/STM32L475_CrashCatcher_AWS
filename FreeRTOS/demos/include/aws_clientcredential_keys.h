@@ -48,7 +48,10 @@
  * "...base64 data...\n"\
  * "-----END CERTIFICATE-----\n"
  */
-#define keyCLIENT_CERTIFICATE_PEM                   NULL
+#define keyCLIENT_CERTIFICATE_PEM \
+"-----BEGIN CERTIFICATE-----\n"\
+"\n"\
+"-----END CERTIFICATE-----\n"\
 
 /*
  * @brief PEM-encoded issuer certificate for AWS IoT Just In Time Registration (JITR).
@@ -88,6 +91,9 @@
  * "...base64 data...\n"\
  * "-----END RSA PRIVATE KEY-----\n"
  */
-#define keyCLIENT_PRIVATE_KEY_PEM                   NULL
+#define keyCLIENT_PRIVATE_KEY_PEM \
+"-----BEGIN RSA PRIVATE KEY-----\n"\
+"\n"\
+"-----END RSA PRIVATE KEY-----\n"
 
 #endif /* AWS_CLIENT_CREDENTIAL_KEYS_H */

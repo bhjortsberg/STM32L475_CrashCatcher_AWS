@@ -121,6 +121,49 @@ static void prvInitializeHeap( void );
 /*-----------------------------------------------------------*/
 
 /**
+ * BHJ:
+ */
+void ButtonTask(void* argument);
+
+typedef struct task_arg {
+    uint32_t type;
+    const char* message;
+} task_arg_t;
+
+SemaphoreHandle_t xSemaphore;
+
+/**
+ * Button checker
+ */
+void ButtonTask(void* argument)
+{
+    /* USER CODE BEGIN 5 */
+    configPRINTF( ( "Starting Button Demo task!\r\n" ) );
+
+    BaseType_t  waitResult;
+
+    task_arg_t* arg = (task_arg_t*)(argument);
+    /* Infinite loop */
+    for(;;)
+    {
+        waitResult = xTaskNotifyWait(0xFFFF, 0xFFFF ,NULL, pdMS_TO_TICKS( 500 ) );
+        if (waitResult == pdTRUE) {
+            if( xSemaphoreTake( xSemaphore, pdMS_TO_TICKS(500) ) == pdTRUE ) {
+                configPRINTF( ( "%s\r\n", arg->message ) );
+                xSemaphoreGive( xSemaphore );
+            } else {
+                configPRINTF(( "Could not take semaphore\n" ));
+            }
+        }
+    }
+    /* USER CODE END 5 */
+}
+
+TaskHandle_t xBhjHandle = NULL;
+#define DEV_ALERT_DUMMY 666
+task_arg_t arg1 = { DEV_ALERT_DUMMY, "User button pressed" };
+
+/**
  * @brief Application runtime entry point.
  */
 int main( void )
@@ -169,8 +212,20 @@ void vApplicationDaemonTaskStartupHook( void )
                 prvCheckWiFiFirmwareVersion();
             #endif /* USE_OFFLOAD_SSL */
 
+            BaseType_t xReturned;
+            xSemaphore = xSemaphoreCreateMutex();
+
+            /* BHJ - Create task for sending alert when user button is pressed */
+            LogInfo( ("BHJ -- Create Task\r\n") );
+            xReturned = xTaskCreate(
+                            ButtonTask,       /* Function that implements the task. */
+                            "DemoTask1",          /* Text name for the task. */
+                            512,      /* Stack size in words, not bytes. */
+                            ( void * ) &arg1,    /* Parameter passed into the task. */
+                            tskIDLE_PRIORITY,/* Priority at which the task is created. */
+                            &xBhjHandle );      /* Used to pass out the created task's handle. */
             /* Start demos. */
-            DEMO_RUNNER_RunDemos();
+            /*DEMO_RUNNER_RunDemos();*/
         }
     }
     else
@@ -653,12 +708,16 @@ static void prvInitializeHeap( void )
  */
 void HAL_GPIO_EXTI_Callback( uint16_t GPIO_Pin )
 {
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     switch( GPIO_Pin )
     {
         /* Pin number 1 is connected to Inventek Module Cmd-Data
          * ready pin. */
         case ( GPIO_PIN_1 ):
             SPI_WIFI_ISR();
+            break;
+        case ( USER_BUTTON_PIN ):
+            vTaskNotifyGiveFromISR( xBhjHandle, &xHigherPriorityTaskWoken );
             break;
 
         default:
