@@ -56,3 +56,25 @@ J-Link: Flash download: Bank 0 @ 0x08000000: 1 range affected (301056 bytes)
 J-Link: Flash download: Total: 6.667s (Prepare: 0.062s, Compare: 0.058s, Erase: 3.262s, Program & Verify: 3.278s, Restore: 0.004s)
 J-Link: Flash download: Program & Verify speed: 89 KB/s
 O.K.
+
+# CrashCatcher and CrashDebug
+
+Save the hexdump from the serial console into a textfile called crash.hex.dmp
+
+Dump the backtrace:
+
+    $ gdb-multiarch build/aws_demos.elf -ex "set target-charset ASCII" -ex "target remote | ~/devel/CrashDebug/bins/lin64/CrashDebug --elf build/aws_demos.elf --dump ../crash.hex.dmp" -quiet -ex "bt" -ex "quit"
+    Reading symbols from build/aws_demos.elf...
+    Remote debugging using | ~/devel/CrashDebug/bins/lin64/CrashDebug --elf build/aws_demos.elf --dump ../crash.hex.dmp
+    0x0badc0de in ?? ()
+    #0  0x0badc0de in ?? ()
+    #1  0x0800f3ca in bhj_crash ()
+    Backtrace stopped: Cannot access memory at address 0x1000258c
+    A debugging session is active.
+
+            Inferior 1 [Remote target] will be killed.
+
+If not doing -ex "quit" gdb will stay open and can be used to inspect the dump.
+
+With a crash one can now run `info mem` and show the memory regions. Those can then be used in `CrashCatcher_GetMemoryRegions()`.
+
