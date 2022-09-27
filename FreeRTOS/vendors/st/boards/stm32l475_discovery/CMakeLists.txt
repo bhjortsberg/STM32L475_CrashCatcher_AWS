@@ -185,6 +185,7 @@ if(AFR_ENABLE_DEMOS OR AFR_ENABLE_TESTS)
         ${config_files}
         "${board_dir}/application_code/main.c"
         "${board_dir}/application_code/crash_hexdump.c"
+        "${board_dir}/application_code/mqtt_client.c"
     )
     target_link_libraries(
         ${exe_target}

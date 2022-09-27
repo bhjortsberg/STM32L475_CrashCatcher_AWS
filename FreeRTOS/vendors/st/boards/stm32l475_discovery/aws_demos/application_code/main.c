@@ -50,6 +50,8 @@
 #include "aws_dev_mode_key_provisioning.h"
 #include "iot_uart.h"
 
+#include "mqtt_client.h"
+
 /* WiFi driver includes. */
 #include "es_wifi.h"
 
@@ -141,6 +143,20 @@ void bhj_crash()
     foo(6);
 }
 
+#define MQTT_MAX_PAYLOAD_SIZE 8192
+static uint8_t ucDataBuffer[MQTT_MAX_PAYLOAD_SIZE] __attribute__ ((aligned (8)));
+
+void send_mqtt()
+{
+    uint32_t size = 512;
+    memset((void*)ucDataBuffer, 'B', size);
+    uint32_t bytesSent = 0;
+    if (ulMqttAWSPortSend(ucDataBuffer, size, "crash.dmp", &bytesSent) != 0)
+    {
+        configPRINTF(("Failed to send MQTT\r\n"));
+    }
+}
+
 /**
  * Button checker
  */
@@ -159,6 +175,7 @@ void ButtonTask(void* argument)
         if (waitResult == pdTRUE) {
             if( xSemaphoreTake( xSemaphore, pdMS_TO_TICKS(500) ) == pdTRUE ) {
                 configPRINTF( ( "%s\r\n", arg->message ) );
+                send_mqtt();
                 bhj_crash();
                 xSemaphoreGive( xSemaphore );
             } else {
@@ -239,6 +256,11 @@ void vApplicationDaemonTaskStartupHook( void )
                             &xBhjHandle );      /* Used to pass out the created task's handle. */
             /* Start demos. */
             /*DEMO_RUNNER_RunDemos();*/
+            if (ulMqttAWSPortInit() != 0)
+            {
+                configPRINTF(("Failed to init MQTT\r\n"));
+                LogInfo(("MQTT Init failed!!"));
+            }
         }
     }
     else
