@@ -16,7 +16,6 @@
 #include <CrashCatcher.h>
 
 
-CRASH_CATCHER_TEST_WRITEABLE CrashCatcherReturnCodes g_crashCatcherDumpEndReturn = CRASH_CATCHER_TRY_AGAIN;
 static                       CrashCatcherInfo        g_info;
 
 static void printString(const char* pString);
@@ -124,12 +123,3 @@ static void dumpWords(const uint32_t* pMemory, size_t elementCount)
     }
 }
 
-
-CrashCatcherReturnCodes CrashCatcher_DumpEnd(void)
-{
-    printString("\r\nEnd of dump\r\n");
-    if (g_crashCatcherDumpEndReturn == CRASH_CATCHER_TRY_AGAIN && g_info.isBKPT)
-        return CRASH_CATCHER_EXIT;
-    else
-        return g_crashCatcherDumpEndReturn;
-}
