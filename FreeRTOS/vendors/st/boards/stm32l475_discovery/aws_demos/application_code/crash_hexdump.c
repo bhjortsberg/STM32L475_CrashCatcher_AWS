@@ -8,7 +8,11 @@ void vSTM32L475putc( void * pv,
 
 const CrashCatcherMemoryRegion* CrashCatcher_GetMemoryRegions(void)
 {
-    return NULL;
+    static const CrashCatcherMemoryRegion regions[] = {
+        {0x10000000, 0x10008000, CRASH_CATCHER_BYTE},
+        {0xFFFFFFFF, 0xFFFFFFFF, CRASH_CATCHER_BYTE}
+    };
+    return regions;
 }
 
 void CrashCatcher_putc(int c)
