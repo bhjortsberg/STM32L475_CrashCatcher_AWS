@@ -133,6 +133,13 @@ SECTIONS
 	. = ALIGN(8);
   } >FLASH
   
+  /* Crash data goes into FLASH */
+  .crash_data :
+  {
+    . = ALIGN(8);
+    *(.crash_data)         /* .crash_data sections */
+    . = ALIGN(8);
+  } >FLASH_UC
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);

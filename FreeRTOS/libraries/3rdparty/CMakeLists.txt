@@ -235,8 +235,7 @@ if(EXISTS "${AFR_3RDPARTY_DIR}/CrashCatcher")
     target_sources(
         afr_3rdparty_crash_catcher PRIVATE
         "${AFR_3RDPARTY_DIR}/CrashCatcher/Core/src/CrashCatcher.c"
-        "${AFR_3RDPARTY_DIR}/CrashCatcher/Core/src/CrashCatcher_armv7m.S"
-        "${AFR_3RDPARTY_DIR}/CrashCatcher/HexDump/src/HexDump.c")
+        "${AFR_3RDPARTY_DIR}/CrashCatcher/Core/src/CrashCatcher_armv7m.S")
     target_include_directories(
         afr_3rdparty_crash_catcher PUBLIC
         "${AFR_3RDPARTY_DIR}/CrashCatcher/include")

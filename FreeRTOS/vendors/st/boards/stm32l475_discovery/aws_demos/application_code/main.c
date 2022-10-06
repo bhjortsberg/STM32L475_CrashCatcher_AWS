@@ -146,16 +146,20 @@ void bhj_crash()
 #define MQTT_MAX_PAYLOAD_SIZE 8192
 static uint8_t ucDataBuffer[MQTT_MAX_PAYLOAD_SIZE] __attribute__ ((aligned (8)));
 
-void send_mqtt()
+extern const char* read_flash(uint32_t*);
+extern int erase_flash();
+
+void send_mqtt(uint8_t* buffer, uint32_t size)
 {
-    uint32_t size = 512;
-    memset((void*)ucDataBuffer, 'B', size);
     uint32_t bytesSent = 0;
-    if (ulMqttAWSPortSend(ucDataBuffer, size, "crash.dmp", &bytesSent) != 0)
+    if (ulMqttAWSPortSend(buffer, size, "crash.dmp", &bytesSent) != 0)
     {
         configPRINTF(("Failed to send MQTT\r\n"));
+        return;
     }
+    configPRINTF(("Successfully sent %d bytes on MQTT", bytesSent));
 }
+
 
 /**
  * Button checker
@@ -175,7 +179,6 @@ void ButtonTask(void* argument)
         if (waitResult == pdTRUE) {
             if( xSemaphoreTake( xSemaphore, pdMS_TO_TICKS(500) ) == pdTRUE ) {
                 configPRINTF( ( "%s\r\n", arg->message ) );
-                send_mqtt();
                 bhj_crash();
                 xSemaphoreGive( xSemaphore );
             } else {
@@ -260,6 +263,20 @@ void vApplicationDaemonTaskStartupHook( void )
             {
                 configPRINTF(("Failed to init MQTT\r\n"));
                 LogInfo(("MQTT Init failed!!"));
+            }
+            if (has_data_flash()) {
+                uint32_t size = 0;
+                const char* data = read_flash(&size);
+                if (size > 0) {
+                    configPRINTF(("Sending %u bytes crash data on MQTT", size));
+                    send_mqtt(data, size);
+                }
+                if (erase_flash() == 0) {
+                    configPRINTF(("FLASH erased"));
+                }
+                else {
+                    configPRINTF(("Failed to erase FLASH"));
+                }
             }
         }
     }

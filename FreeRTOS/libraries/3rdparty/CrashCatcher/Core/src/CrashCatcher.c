@@ -79,7 +79,7 @@ static void printString(const char* pString)
 
 void CrashCatcher_Entry(const CrashCatcherExceptionRegisters* pExceptionRegisters)
 {
-    printString("CrashCatcher");
+    printString("CrashCatcher\r\n");
     Object object = initStackPointers(pExceptionRegisters);
     advanceStackPointerToValueBeforeException(&object);
     initFloatingPointFlag(&object);
