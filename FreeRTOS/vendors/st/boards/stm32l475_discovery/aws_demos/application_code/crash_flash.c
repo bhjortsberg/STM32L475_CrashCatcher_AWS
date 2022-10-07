@@ -84,7 +84,7 @@ CrashCatcherReturnCodes CrashCatcher_DumpEnd(void)
     /* Write size first in the buffer */
     uint32_t size = (uint32_t)ucBufferPos - (uint32_t)&ucDataBuffer[4];
     memcpy(ucDataBuffer, &size, sizeof(uint32_t));
-    int ret = store_flash(ucDataBuffer, size);
+    int ret = store_flash(ucDataBuffer, size + sizeof(uint32_t));
     switch (ret) {
         case -1:
             printString("Failed to write size to FLASH\r\n");
