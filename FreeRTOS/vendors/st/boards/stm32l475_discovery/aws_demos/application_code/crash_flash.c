@@ -91,13 +91,13 @@ CrashCatcherReturnCodes CrashCatcher_DumpEnd(void)
     int ret = store_flash(ucDataBuffer, size + sizeof(uint32_t));
     switch (ret) {
         case -1:
-            printString("Failed to write size to FLASH\r\n");
+            printString("Failed to erase FLASH\r\n");
               break;
         case -2:
-            printString("Failed to write flash\r\n");
+            printString("Failed to write FLASH\r\n");
             break;
         case 0:
-            printString("Wrote to flash\r\n");
+            printString("Wrote crash to FLASH\r\n");
             break;
     }
 

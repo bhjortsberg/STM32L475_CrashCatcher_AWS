@@ -261,17 +261,14 @@ void vApplicationDaemonTaskStartupHook( void )
                 configPRINTF(("Failed to init MQTT\r\n"));
                 LogInfo(("MQTT Init failed!!"));
             }
-            if (has_data_flash()) {
-                uint32_t size = 0;
-                const char* data = read_flash(&size);
-                if (size > 0) {
-                    configPRINTF(("Sending %u bytes crash data on MQTT", size));
-                    send_mqtt(data, size);
-                }
+            uint32_t size = 0;
+            const char* data = read_flash(&size);
+            if (size > 0) {
+                configPRINTF(("Sending %u bytes crash data on MQTT", size));
+                send_mqtt(data, size);
                 if (erase_flash() == 0) {
                     configPRINTF(("FLASH erased"));
-                }
-                else {
+                } else {
                     configPRINTF(("Failed to erase FLASH"));
                 }
             }
