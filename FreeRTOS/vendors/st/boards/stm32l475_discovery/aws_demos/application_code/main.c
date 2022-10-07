@@ -146,9 +146,6 @@ void bhj_crash()
 #define MQTT_MAX_PAYLOAD_SIZE 8192
 static uint8_t ucDataBuffer[MQTT_MAX_PAYLOAD_SIZE] __attribute__ ((aligned (8)));
 
-extern const char* read_flash(uint32_t*);
-extern int erase_flash();
-
 void send_mqtt(uint8_t* buffer, uint32_t size)
 {
     uint32_t bytesSent = 0;
