@@ -34,7 +34,7 @@ void CrashCatcher_DumpStart(const CrashCatcherInfo* pInfo)
 {
     (void)pInfo;
     printString("DumpStart\r\n");
-    ucBufferPos = ucDataBuffer;
+    ucBufferPos = &ucDataBuffer[4];
 }
 
 void CrashCatcher_DumpMemory(const void* pvMemory, CrashCatcherElementSizes elementSize, size_t elementCount)
@@ -81,7 +81,10 @@ static void dumpWords(const uint32_t* pMemory, size_t elementCount)
 CrashCatcherReturnCodes CrashCatcher_DumpEnd(void)
 {
     printString("Dump End\r\n");
-    int ret = store_flash(ucDataBuffer, (uint32_t)ucBufferPos - (uint32_t)ucDataBuffer);
+    /* Write size first in the buffer */
+    uint32_t size = (uint32_t)ucBufferPos - (uint32_t)&ucDataBuffer[4];
+    memcpy(ucDataBuffer, &size, sizeof(uint32_t));
+    int ret = store_flash(ucDataBuffer, size);
     switch (ret) {
         case -1:
             printString("Failed to write size to FLASH\r\n");
