@@ -143,6 +143,20 @@ void bhj_crash()
     foo(6);
 }
 
+void moreCalls() {
+    configPRINTF(("a function\r\n"));
+    bhj_crash();
+}
+void anothercall() {
+    configPRINTF(("another function\r\n" ));
+    moreCalls();
+}
+
+void call1() {
+    configPRINTF(("a call\r\n" ));
+    anothercall();
+}
+
 #define MQTT_MAX_PAYLOAD_SIZE 8192
 static uint8_t ucDataBuffer[MQTT_MAX_PAYLOAD_SIZE] __attribute__ ((aligned (8)));
 
@@ -176,7 +190,7 @@ void ButtonTask(void* argument)
         if (waitResult == pdTRUE) {
             if( xSemaphoreTake( xSemaphore, pdMS_TO_TICKS(500) ) == pdTRUE ) {
                 configPRINTF( ( "%s\r\n", arg->message ) );
-                bhj_crash();
+                call1();
                 xSemaphoreGive( xSemaphore );
             } else {
                 configPRINTF(( "Could not take semaphore\n" ));
