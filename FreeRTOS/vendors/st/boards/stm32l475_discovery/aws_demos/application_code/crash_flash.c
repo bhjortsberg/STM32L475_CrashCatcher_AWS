@@ -27,7 +27,11 @@ static void printString(const char* pString)
 
 const CrashCatcherMemoryRegion* CrashCatcher_GetMemoryRegions(void)
 {
-    return NULL;
+    static const CrashCatcherMemoryRegion regions[] = {
+        {0x10002000, 0x10002800, CRASH_CATCHER_BYTE},
+        {0xFFFFFFFF, 0xFFFFFFFF, CRASH_CATCHER_BYTE}
+    };
+    return regions;
 }
 
 void CrashCatcher_DumpStart(const CrashCatcherInfo* pInfo)
