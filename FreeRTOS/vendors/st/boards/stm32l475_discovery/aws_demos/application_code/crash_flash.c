@@ -29,6 +29,7 @@ const CrashCatcherMemoryRegion* CrashCatcher_GetMemoryRegions(void)
 {
     static const CrashCatcherMemoryRegion regions[] = {
         {0x10002000, 0x10002800, CRASH_CATCHER_BYTE},
+        {0x20017000, 0x20018000, CRASH_CATCHER_BYTE},
         {0xFFFFFFFF, 0xFFFFFFFF, CRASH_CATCHER_BYTE}
     };
     return regions;
